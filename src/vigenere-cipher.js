@@ -19,14 +19,59 @@ const { NotImplementedError } = require('../extensions/index.js');
  * reverseMachine.decrypt('AEIHQX SX DLLU!', 'alphonse') => '!NWAD TA KCATTA'
  * 
  */
+function isAlphabet(char) {
+  return char.toUpperCase() !== char.toLowerCase();
+}
+
 class VigenereCipheringMachine {
-  encrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  #A = 'A'.charCodeAt(0);
+  
+  constructor(type = true) {
+    this.type = type;
   }
-  decrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+
+  encrypt(data, key) {
+    if (!(data && key)) {
+      throw new Error('Incorrect arguments!');
+    }
+
+    let dataArr = data.toUpperCase().split('');
+    let keyArr = key.toUpperCase().split('').map(item => item.charCodeAt(0) - this.#A);
+    let keyIdx = 0;
+    let res = [];
+
+    for (let i = 0; i < dataArr.length; i++) {
+      if (isAlphabet(dataArr[i])) {
+        res.push(String.fromCharCode(this.#A + (dataArr[i].charCodeAt(0) - this.#A + keyArr[keyIdx % keyArr.length]) % 26));
+        keyIdx++;
+      } else {
+        res.push(dataArr[i]);
+      }
+    }
+
+    return this.type ? res.join('') : res.reverse().join('');
+  }
+
+  decrypt(data, key) {
+    if (!(data && key)) {
+      throw new Error('Incorrect arguments!');
+    }
+
+    let dataArr = data.toUpperCase().split('');
+    let keyArr = key.toUpperCase().split('').map(item => item.charCodeAt(0) - this.#A);
+    let keyIdx = 0;
+    let res = [];
+
+    for (let i = 0; i < dataArr.length; i++) {
+      if (isAlphabet(dataArr[i])) {
+        res.push(String.fromCharCode(this.#A + (dataArr[i].charCodeAt(0) - this.#A - keyArr[keyIdx % keyArr.length] + 26) % 26));
+        keyIdx++;
+      } else {
+        res.push(dataArr[i]);
+      }
+    }
+
+    return this.type ? res.join('') : res.reverse().join('');
   }
 }
 
